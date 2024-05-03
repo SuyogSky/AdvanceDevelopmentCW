@@ -1,0 +1,12 @@
+C:\Users\Administrator\Documents\AD CW 2\Bislerium\Domain.Bislerium\bin\Debug\net8.0\Domain.Bislerium.deps.json
+C:\Users\Administrator\Documents\AD CW 2\Bislerium\Domain.Bislerium\bin\Debug\net8.0\Domain.Bislerium.dll
+C:\Users\Administrator\Documents\AD CW 2\Bislerium\Domain.Bislerium\bin\Debug\net8.0\Domain.Bislerium.pdb
+C:\Users\Administrator\Documents\AD CW 2\Bislerium\Domain.Bislerium\obj\Debug\net8.0\Domain.Bislerium.csproj.AssemblyReference.cache
+C:\Users\Administrator\Documents\AD CW 2\Bislerium\Domain.Bislerium\obj\Debug\net8.0\Domain.Bislerium.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Administrator\Documents\AD CW 2\Bislerium\Domain.Bislerium\obj\Debug\net8.0\Domain.Bislerium.AssemblyInfoInputs.cache
+C:\Users\Administrator\Documents\AD CW 2\Bislerium\Domain.Bislerium\obj\Debug\net8.0\Domain.Bislerium.AssemblyInfo.cs
+C:\Users\Administrator\Documents\AD CW 2\Bislerium\Domain.Bislerium\obj\Debug\net8.0\Domain.Bislerium.csproj.CoreCompileInputs.cache
+C:\Users\Administrator\Documents\AD CW 2\Bislerium\Domain.Bislerium\obj\Debug\net8.0\Domain.Bislerium.dll
+C:\Users\Administrator\Documents\AD CW 2\Bislerium\Domain.Bislerium\obj\Debug\net8.0\refint\Domain.Bislerium.dll
+C:\Users\Administrator\Documents\AD CW 2\Bislerium\Domain.Bislerium\obj\Debug\net8.0\Domain.Bislerium.pdb
+C:\Users\Administrator\Documents\AD CW 2\Bislerium\Domain.Bislerium\obj\Debug\net8.0\ref\Domain.Bislerium.dll

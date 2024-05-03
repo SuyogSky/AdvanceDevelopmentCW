@@ -1,0 +1,15 @@
+C:\Users\Administrator\Documents\AD CW 2\Bislerium\Application.Bislerium\bin\Debug\net8.0\Application.Bislerium.deps.json
+C:\Users\Administrator\Documents\AD CW 2\Bislerium\Application.Bislerium\bin\Debug\net8.0\Application.Bislerium.dll
+C:\Users\Administrator\Documents\AD CW 2\Bislerium\Application.Bislerium\bin\Debug\net8.0\Application.Bislerium.pdb
+C:\Users\Administrator\Documents\AD CW 2\Bislerium\Application.Bislerium\bin\Debug\net8.0\Domain.Bislerium.dll
+C:\Users\Administrator\Documents\AD CW 2\Bislerium\Application.Bislerium\bin\Debug\net8.0\Domain.Bislerium.pdb
+C:\Users\Administrator\Documents\AD CW 2\Bislerium\Application.Bislerium\obj\Debug\net8.0\Application.Bislerium.csproj.AssemblyReference.cache
+C:\Users\Administrator\Documents\AD CW 2\Bislerium\Application.Bislerium\obj\Debug\net8.0\Application.Bislerium.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Administrator\Documents\AD CW 2\Bislerium\Application.Bislerium\obj\Debug\net8.0\Application.Bislerium.AssemblyInfoInputs.cache
+C:\Users\Administrator\Documents\AD CW 2\Bislerium\Application.Bislerium\obj\Debug\net8.0\Application.Bislerium.AssemblyInfo.cs
+C:\Users\Administrator\Documents\AD CW 2\Bislerium\Application.Bislerium\obj\Debug\net8.0\Application.Bislerium.csproj.CoreCompileInputs.cache
+C:\Users\Administrator\Documents\AD CW 2\Bislerium\Application.Bislerium\obj\Debug\net8.0\Applicat.CFFC3FF3.Up2Date
+C:\Users\Administrator\Documents\AD CW 2\Bislerium\Application.Bislerium\obj\Debug\net8.0\Application.Bislerium.dll
+C:\Users\Administrator\Documents\AD CW 2\Bislerium\Application.Bislerium\obj\Debug\net8.0\refint\Application.Bislerium.dll
+C:\Users\Administrator\Documents\AD CW 2\Bislerium\Application.Bislerium\obj\Debug\net8.0\Application.Bislerium.pdb
+C:\Users\Administrator\Documents\AD CW 2\Bislerium\Application.Bislerium\obj\Debug\net8.0\ref\Application.Bislerium.dll
