@@ -10,3 +10,4 @@ C:\Users\Administrator\Documents\AD CW 2\Bislerium\Domain.Bislerium\obj\Debug\ne
 C:\Users\Administrator\Documents\AD CW 2\Bislerium\Domain.Bislerium\obj\Debug\net8.0\refint\Domain.Bislerium.dll
 C:\Users\Administrator\Documents\AD CW 2\Bislerium\Domain.Bislerium\obj\Debug\net8.0\Domain.Bislerium.pdb
 C:\Users\Administrator\Documents\AD CW 2\Bislerium\Domain.Bislerium\obj\Debug\net8.0\ref\Domain.Bislerium.dll
+C:\Users\Administrator\Documents\AD CW 2\Bislerium\Domain.Bislerium\obj\Debug\net8.0\Domain.Bislerium.sourcelink.json

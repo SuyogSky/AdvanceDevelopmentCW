@@ -13,3 +13,6 @@ C:\Users\Administrator\Documents\AD CW 2\Bislerium\Application.Bislerium\obj\Deb
 C:\Users\Administrator\Documents\AD CW 2\Bislerium\Application.Bislerium\obj\Debug\net8.0\refint\Application.Bislerium.dll
 C:\Users\Administrator\Documents\AD CW 2\Bislerium\Application.Bislerium\obj\Debug\net8.0\Application.Bislerium.pdb
 C:\Users\Administrator\Documents\AD CW 2\Bislerium\Application.Bislerium\obj\Debug\net8.0\ref\Application.Bislerium.dll
+C:\Users\Administrator\Documents\AD CW 2\Bislerium\Application.Bislerium\obj\Debug\net8.0\Application.Bislerium.sourcelink.json
+C:\Users\Administrator\Documents\AD CW 2\Bislerium\Application.Bislerium\bin\Debug\net8.0\Application.Bislerium.runtimeconfig.json
+C:\Users\Administrator\Documents\AD CW 2\Bislerium\Application.Bislerium\obj\Debug\net8.0\Application.Bislerium.genruntimeconfig.cache

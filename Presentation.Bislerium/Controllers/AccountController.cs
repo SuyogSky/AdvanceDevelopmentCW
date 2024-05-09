@@ -2,44 +2,91 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
+using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
-using System.Text;
-
+using System.Reflection.Metadata;
+using Application.Bislerium;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using Infrastructure.Bislerium;
 namespace Presentation.Bislerium.Controllers
 {
     [ApiController]
-    [Route("accounts/[controller]")]
-
+    [Route("api/[controller]")]
     public class AccountController : Controller
     {
-
+        private readonly IOtpService _otpService;
         private readonly UserManager<AppUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
-        private readonly IConfiguration _configuration;
-        private readonly SignInManager<AppUser> _signInManager;
-
-        public record LoginResponse(bool Flag, string Token, string Message);
-        public record UserSession(string? Id, string? Name, string? Email, string? Role);
-
-        public AccountController(UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration, SignInManager<AppUser> signInManager)
+        private readonly IWebHostEnvironment _environment;
+        private readonly IEmailCustomSender _emailSender;
+        public AccountController(UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager, IWebHostEnvironment environment, IOtpService service, IEmailCustomSender emailSenderService)
         {
             _userManager = userManager;
+            _otpService = service;
             _roleManager = roleManager;
-            _configuration = configuration;
-            _signInManager = signInManager;
+            _environment = environment;
+            _emailSender = emailSenderService;
+        }
+
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword([FromBody] EmailToOtpModel emailToOtp)
+        {
+            var user = await _userManager.FindByEmailAsync(emailToOtp.Email);
+            if (user == null)
+                return BadRequest("No user associated with the email address.");
+
+            var (success, otp) = await _otpService.GenerateOtpAsync(user);
+            if (!success)
+                return BadRequest("Error generating OTP.");
+
+            // Assuming EmailSender is correctly configured and handles sending emails.
+            await _emailSender.SendEmailAsync(emailToOtp.Email, "Password Reset OTP", $"Your OTP is: {otp}");
+
+            return Ok("OTP sent to your email address.");
+        }
+
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] OtpDetailsModel otpDetails)
+        {
+            var user = await _userManager.FindByEmailAsync(otpDetails.Email);
+            if(user == null)
+            {
+                return NotFound("User not found.");
+            }
+            var verifyOtp = await _otpService.VerifyOtpAsync(user!.Id, otpDetails.Otp);
+            if (!verifyOtp)
+                return BadRequest("Invalid or expired OTP.");
+
+ 
+
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            if (string.IsNullOrEmpty(token))
+            {
+                return BadRequest("Failed to generate password reset token.");
+            }
+
+            var result = await _userManager.ResetPasswordAsync(user, token, otpDetails.NewPassword);
+            if (!result.Succeeded)
+            {
+                return BadRequest(result.Errors);
+            }
+            if (!result.Succeeded)
+            {
+                return BadRequest(result.Errors);
+            }
+
+            return Ok("Password successfully updated.");
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromForm] RegisterBloggerModel model)
+        public async Task<IActionResult> Register([FromForm] RegisterViewModel model)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var user = new AppUser { UserName = model.Email, Email = model.Email };
+            var user = new AppUser { UserName = model.UserName, Email = model.Email, };
             var roleExists = await _roleManager.RoleExistsAsync(model.Role!);
 
 
@@ -47,64 +94,29 @@ namespace Presentation.Bislerium.Controllers
             {
                 return BadRequest("Invalid role specified.");
             }
-
+            if (model.ImageFile != null && model.ImageFile.Length > 0)
+            {
+                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(model.ImageFile.FileName);
+                var filePath = Path.Combine(_environment.WebRootPath, "uploads", fileName);
+                if (!Directory.Exists(Path.GetDirectoryName(filePath)))
+                {
+                    Directory.CreateDirectory(Path.GetDirectoryName(filePath)!);
+                } 
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await model.ImageFile.CopyToAsync(stream);
+                }
+                user.Image = Url.Content($"~/uploads/{fileName}");
+            }
             var result = await _userManager.CreateAsync(user, model.Password!);
             if (result.Succeeded)
             {
                 await _userManager.AddToRoleAsync(user, model.Role!);
-
-
-
                 return Ok("User registered successfully.");
             }
 
             return BadRequest(result.Errors);
         }
-
-
-        private string GenerateJSONWebToken(UserSession userInfo)
-        {
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
-            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-            var claims = new[]
-            {
-               new Claim(ClaimTypes.Email, userInfo.Email!),
-               new Claim(ClaimTypes.Name, userInfo.Name!),
-               new Claim(ClaimTypes.NameIdentifier, userInfo.Id!),
-               new Claim(ClaimTypes.Role, userInfo.Role!),
-
-            };
-            var token = new JwtSecurityToken(
-              issuer: _configuration["Jwt:Issuer"],
-              audience: _configuration["Jwt:Audience"],
-              claims: claims,
-              expires: DateTime.Now.AddDays(1),
-              signingCredentials: credentials
-            );
-            return new JwtSecurityTokenHandler().WriteToken(token);
-        }
-
-        [HttpPost("Login")]
-        public async Task<LoginResponse> Login([FromBody] LoginModel loginUser)
-        {
-            var result = await _signInManager.PasswordSignInAsync(loginUser.Email, loginUser.Password, false, lockoutOnFailure: false);
-            if (result.Succeeded)
-            {
-
-                var getUser = await _userManager.FindByEmailAsync(loginUser.Email);
-                var getUserRole = await _userManager.GetRolesAsync(getUser);
-                var userSession = new UserSession(getUser.Id, getUser.UserName, getUser.Email, getUserRole.First());
-                string token = GenerateJSONWebToken(userSession);
-
-                return new LoginResponse(true, token!, "Login completed");
-
-            }
-            else
-            {
-                return new LoginResponse(false, null!, "Login not completed");
-            }
-        }
-
 
         [HttpGet("Getuser")]
         public async Task<IActionResult> GetUsers()
@@ -129,7 +141,7 @@ namespace Presentation.Bislerium.Controllers
             }
             return BadRequest(result.Errors);
         }
-
+       
         [HttpPut, Route("UpdateStudent")]
         public async Task<IActionResult> UpdateStudent(string userId, string email, string username, string phoneNumber)
         {
@@ -146,16 +158,27 @@ namespace Presentation.Bislerium.Controllers
         }
 
         [HttpPut, Route("ChangePassword")]
-        public async Task<IActionResult> ChangePassword(string userId, string password)
+        public async Task<IActionResult> ChangePassword(ChangePasswordModel model)
         {
-            var student = await _userManager.FindByIdAsync(userId);
-            if (student != null)
+            if (string.IsNullOrEmpty(model.Email))
             {
-                var token = await _userManager.GeneratePasswordResetTokenAsync(student);
-                var result = await _userManager.ResetPasswordAsync(student, token, password);
+                return Unauthorized("Invalid user token.");
+            }
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null)
+            {
+                return NotFound("User not found.");
+            }
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var result = await _userManager.ResetPasswordAsync(user, token, model.NewPassword);
+            if (!result.Succeeded)
+            {
+                return BadRequest(result.Errors);
             }
 
-            return StatusCode(StatusCodes.Status200OK, "Successfully updated");
+            return Ok("Password successfully updated.");
         }
+           
+        }
+
     }
-}

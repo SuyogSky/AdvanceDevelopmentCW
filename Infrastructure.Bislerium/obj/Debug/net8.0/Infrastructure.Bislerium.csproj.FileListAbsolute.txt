@@ -17,3 +17,4 @@ C:\Users\Administrator\Documents\AD CW 2\Bislerium\Infrastructure.Bislerium\obj\
 C:\Users\Administrator\Documents\AD CW 2\Bislerium\Infrastructure.Bislerium\obj\Debug\net8.0\Infrastructure.Bislerium.pdb
 C:\Users\Administrator\Documents\AD CW 2\Bislerium\Infrastructure.Bislerium\obj\Debug\net8.0\Infrastructure.Bislerium.genruntimeconfig.cache
 C:\Users\Administrator\Documents\AD CW 2\Bislerium\Infrastructure.Bislerium\obj\Debug\net8.0\ref\Infrastructure.Bislerium.dll
+C:\Users\Administrator\Documents\AD CW 2\Bislerium\Infrastructure.Bislerium\obj\Debug\net8.0\Infrastructure.Bislerium.sourcelink.json

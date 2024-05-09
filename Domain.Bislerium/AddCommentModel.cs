@@ -7,14 +7,12 @@ using System.Threading.Tasks;
 
 namespace Domain.Bislerium
 {
-    public class Blog
+    public class AddCommentModel
     {
-        [Key]
-        public Guid Id { get; set; }
+        [Required]
+        public Guid BlogPostId { get; set; }
 
         [Required]
         public string? Content { get; set; }
-        [Required]
-        public string? Image { get; set; }
     }
 }

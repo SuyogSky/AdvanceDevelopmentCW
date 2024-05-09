@@ -99,3 +99,5 @@ C:\Users\Administrator\Documents\AD CW 2\Bislerium\Presentation.Bislerium\obj\De
 C:\Users\Administrator\Documents\AD CW 2\Bislerium\Presentation.Bislerium\obj\Debug\net8.0\Presentation.Bislerium.pdb
 C:\Users\Administrator\Documents\AD CW 2\Bislerium\Presentation.Bislerium\obj\Debug\net8.0\Presentation.Bislerium.genruntimeconfig.cache
 C:\Users\Administrator\Documents\AD CW 2\Bislerium\Presentation.Bislerium\obj\Debug\net8.0\ref\Presentation.Bislerium.dll
+C:\Users\Administrator\Documents\AD CW 2\Bislerium\Presentation.Bislerium\obj\Debug\net8.0\Presentation.Bislerium.sourcelink.json
+C:\Users\Administrator\Documents\AD CW 2\Bislerium\Presentation.Bislerium\bin\Debug\net8.0\Presentation.Bislerium.staticwebassets.runtime.json
