@@ -8,6 +8,8 @@ using System.Reflection.Metadata;
 using Application.Bislerium;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Infrastructure.Bislerium;
+using Application.Bislerium;
+using Domain.Bislerium;
 namespace Presentation.Bislerium.Controllers
 {
     [ApiController]
@@ -39,7 +41,6 @@ namespace Presentation.Bislerium.Controllers
             if (!success)
                 return BadRequest("Error generating OTP.");
 
-            // Assuming EmailSender is correctly configured and handles sending emails.
             await _emailSender.SendEmailAsync(emailToOtp.Email, "Password Reset OTP", $"Your OTP is: {otp}");
 
             return Ok("OTP sent to your email address.");
@@ -49,7 +50,7 @@ namespace Presentation.Bislerium.Controllers
         public async Task<IActionResult> ResetPassword([FromBody] OtpDetailsModel otpDetails)
         {
             var user = await _userManager.FindByEmailAsync(otpDetails.Email);
-            if(user == null)
+            if (user == null)
             {
                 return NotFound("User not found.");
             }
@@ -57,7 +58,7 @@ namespace Presentation.Bislerium.Controllers
             if (!verifyOtp)
                 return BadRequest("Invalid or expired OTP.");
 
- 
+
 
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
             if (string.IsNullOrEmpty(token))
@@ -86,14 +87,28 @@ namespace Presentation.Bislerium.Controllers
                 return BadRequest(ModelState);
             }
 
-            var user = new AppUser { UserName = model.UserName, Email = model.Email, };
-            var roleExists = await _roleManager.RoleExistsAsync(model.Role!);
+            // Check if a user with the provided email already exists
+            var existingUserByEmail = await _userManager.FindByEmailAsync(model.Email);
+            if (existingUserByEmail != null)
+            {
+                return BadRequest(new { success = 0, err = "Email is already registered." });
+            }
 
+            // Check if a user with the provided username already exists
+            var existingUserByUsername = await _userManager.FindByNameAsync(model.UserName);
+            if (existingUserByUsername != null)
+            {
+                return BadRequest(new { success = 0, err = "Username is already taken." });
+            }
+
+            var user = new AppUser { Email = model.Email, UserName = model.UserName };
+            var roleExists = await _roleManager.RoleExistsAsync(model.Role!);
 
             if (!roleExists)
             {
-                return BadRequest("Invalid role specified.");
+                return BadRequest(new { success = 0, err = "Invalid role specified." });
             }
+
             if (model.ImageFile != null && model.ImageFile.Length > 0)
             {
                 var fileName = Guid.NewGuid().ToString() + Path.GetExtension(model.ImageFile.FileName);
@@ -101,21 +116,22 @@ namespace Presentation.Bislerium.Controllers
                 if (!Directory.Exists(Path.GetDirectoryName(filePath)))
                 {
                     Directory.CreateDirectory(Path.GetDirectoryName(filePath)!);
-                } 
+                }
                 using (var stream = new FileStream(filePath, FileMode.Create))
                 {
                     await model.ImageFile.CopyToAsync(stream);
                 }
                 user.Image = Url.Content($"~/uploads/{fileName}");
             }
+
             var result = await _userManager.CreateAsync(user, model.Password!);
             if (result.Succeeded)
             {
                 await _userManager.AddToRoleAsync(user, model.Role!);
-                return Ok("User registered successfully.");
+                return Ok(new { success = 1, message = "User registered successfully." });
             }
 
-            return BadRequest(result.Errors);
+            return BadRequest(new { success = 0, err = result.Errors });
         }
 
         [HttpGet("Getuser")]
@@ -141,7 +157,7 @@ namespace Presentation.Bislerium.Controllers
             }
             return BadRequest(result.Errors);
         }
-       
+
         [HttpPut, Route("UpdateStudent")]
         public async Task<IActionResult> UpdateStudent(string userId, string email, string username, string phoneNumber)
         {
@@ -178,7 +194,81 @@ namespace Presentation.Bislerium.Controllers
 
             return Ok("Password successfully updated.");
         }
-           
+        [Authorize]
+        [HttpPut("update-username")]
+        public async Task<IActionResult> UpdateUsername([FromBody] UpdateUsernameModel model)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var user = await _userManager.FindByIdAsync(userId!);
+            if (user == null)
+            {
+                return NotFound("User not found.");
+            }
+
+            user.UserName = model.NewUsername;
+            var result = await _userManager.UpdateAsync(user);
+            if (!result.Succeeded)
+            {
+                return BadRequest(result.Errors);
+            }
+
+            var userDetails = new
+            {
+                Username = user.UserName,
+                Email = user.Email,
+                Id = user.Id,
+                Role = (await _userManager.GetRolesAsync(user)).FirstOrDefault(),
+                ImageUrl = user.Image
+            };
+
+            return Ok(userDetails);
         }
 
+        [Authorize]
+        [HttpPut("update-image")]
+        public async Task<IActionResult> UpdateImage([FromForm] UpdateUserImageModel model)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var user = await _userManager.FindByIdAsync(userId!);
+            if (user == null)
+            {
+                return NotFound("User not found.");
+            }
+
+            if (model.ImageFile != null && model.ImageFile.Length > 0)
+            {
+                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(model.ImageFile.FileName);
+                var filePath = Path.Combine(_environment.WebRootPath, "uploads", fileName);
+                if (!Directory.Exists(Path.GetDirectoryName(filePath)))
+                {
+                    Directory.CreateDirectory(Path.GetDirectoryName(filePath)!);
+                }
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await model.ImageFile.CopyToAsync(stream);
+                }
+                user.Image = Url.Content($"~/uploads/{fileName}");
+            }
+
+            var result = await _userManager.UpdateAsync(user);
+            if (!result.Succeeded)
+            {
+                return BadRequest(result.Errors);
+            }
+
+            var userDetails = new
+            {
+                Username = user.UserName,
+                Email = user.Email,
+                Id = user.Id,
+                Role = (await _userManager.GetRolesAsync(user)).FirstOrDefault(),  // Assuming user has one role
+                ImageUrl = user.Image  // Include the image URL
+            };
+
+            return Ok(userDetails);
+        }
+
+
     }
+
+}

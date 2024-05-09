@@ -1,4 +1,5 @@
 ﻿using Domain.Bislerium;
+using Domain.Bislerium;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,5 +15,8 @@ namespace Application.Bislerium
         Task<bool> DeleteBlogPost(String blogPostId);
         Task<(IEnumerable<BlogWithReactions> blogPostsWithReactions, int totalCount)> GetAllBlogPosts(int pageNumber, int pageSize, string? sortType);
         Task<IEnumerable<BlogPost?>> GetBlogPostById(String blogPostId);
+        Task<IEnumerable<BlogWithReactions>> GetUsersBlogs(String userId);
+
+        Task<IEnumerable<BlogHistory>> GetUsersBlogHistoru(String userId);
     }
 }

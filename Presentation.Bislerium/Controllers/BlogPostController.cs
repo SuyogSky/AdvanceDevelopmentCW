@@ -1,5 +1,8 @@
 ﻿using Application.Bislerium;
+using Application.Bislerium;
 using Domain.Bislerium;
+using Domain.Bislerium;
+using Infrastructure.Bislerium;
 using Infrastructure.Bislerium;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -18,7 +21,7 @@ namespace Presentation.Bislerium.Controllers
         private readonly AplicationDBContext aplicationDbContext;
         private readonly TokenService tokenService;
         private readonly UserManager<AppUser> _userManager;
-        public BlogPostController(AplicationDBContext aplicationDbContext,IBlogPostService blogPostService, ILogger<AddBlogPost> logger, IWebHostEnvironment environment, TokenService tokenService, UserManager<AppUser> userManager = null)
+        public BlogPostController(AplicationDBContext aplicationDbContext, IBlogPostService blogPostService, ILogger<AddBlogPost> logger, IWebHostEnvironment environment, TokenService tokenService, UserManager<AppUser> userManager = null)
         {
             this.aplicationDbContext = aplicationDbContext;
             _logger = logger;
@@ -27,6 +30,37 @@ namespace Presentation.Bislerium.Controllers
             this.tokenService = tokenService;
             _userManager = userManager;
         }
+
+        [Authorize(Roles = "Blogger")]
+        [HttpGet("my-blog-history")]
+        public async Task<IActionResult> GetMyBlogHistory()
+        {
+            try
+            {
+                var token = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+
+                string userId = tokenService.GetUserIdFromToken(token!);
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return Unauthorized("Unable to retrieve user ID from token.");
+                }
+
+                // Retrieve the user's blog history
+                var blogHistory = await _blogPostService.GetUsersBlogHistoru(userId);
+                if (blogHistory == null || !blogHistory.Any())
+                {
+                    return NotFound("No history found for the user's blogs.");
+                }
+
+                return Ok(blogHistory);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving user blog history.");
+                return StatusCode(500, "An error occurred while retrieving the blog history. Please try again.");
+            }
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetBlogPost(string id)
         {
@@ -144,7 +178,7 @@ namespace Presentation.Bislerium.Controllers
             }
             try
             {
-                var (blogPostsWithReactions, totalCount) = await _blogPostService.GetAllBlogPosts(pageNumber, pageSize,sortType);
+                var (blogPostsWithReactions, totalCount) = await _blogPostService.GetAllBlogPosts(pageNumber, pageSize, sortType);
                 if (blogPostsWithReactions == null || !blogPostsWithReactions.Any())
                 {
                     _logger.LogWarning("No blog posts found.");
@@ -177,11 +211,12 @@ namespace Presentation.Bislerium.Controllers
                 var token = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
                 string userId = tokenService.GetUserIdFromToken(token!);
                 var blogPost = await _blogPostService.GetBlogPostById(blogPostId.ToString());
-                if(blogPost == null || !blogPost.Any()) { 
-                     return NotFound("No blog posts found.");
+                if (blogPost == null || !blogPost.Any())
+                {
+                    return NotFound("No blog posts found.");
                 }
                 BlogPost post = blogPost.First()!;
-                if(post.AuthorId.ToString() != userId)
+                if (post.AuthorId.ToString() != userId)
                 {
                     return StatusCode(403, "You donot have the permission to do this.");
                 }
@@ -201,6 +236,37 @@ namespace Presentation.Bislerium.Controllers
                 return StatusCode(500, "An error occurred while deleting the blog post. Please try again.");
             }
         }
+        [Authorize(Roles = "Blogger")]
+        [HttpGet("my-blogs")]
+        public async Task<IActionResult> GetUserBlogs()
+        {
+            try
+            {
+                var token = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+                string userId = tokenService.GetUserIdFromToken(token!);
+
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return Unauthorized("Unable to retrieve user ID from token.");
+                }
+
+                var userBlogs = await _blogPostService.GetUsersBlogs(userId);
+
+                if (userBlogs == null || !userBlogs.Any())
+                {
+                    return NotFound("No blogs found for the current user.");
+                }
+
+                return Ok(userBlogs);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving user blogs.");
+                return StatusCode(500, "An error occurred while retrieving the blogs. Please try again.");
+            }
+        }
+
+
         [Authorize(Roles = "Blogger")]
         [HttpPost("add")]
         public async Task<IActionResult> AddBlog([FromForm] AddBlogPost addBlogPost)

@@ -16,7 +16,7 @@ namespace Infrastructure.Bislerium
         {
             using (var client = new SmtpClient("smtp.gmail.com", 587))
             {
-                client.Credentials = new NetworkCredential("timsinarewon3@gmail.com", "jyhgnuwyaagcwcvv");
+                client.Credentials = new NetworkCredential("shakyasuyog214@gmail.com", "jyhgnuwyaagcwcvv");
                 client.EnableSsl = true;
 
                 var mailMessage = new MailMessage

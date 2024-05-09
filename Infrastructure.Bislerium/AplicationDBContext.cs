@@ -12,6 +12,7 @@ namespace Infrastructure.Bislerium
     public class AplicationDBContext: IdentityDbContext<AppUser>
     {
         public DbSet<BlogPost> BlogPosts { get; set; }
+        public DbSet<BlogHistory> BlogHistory{ get; set; }
         public DbSet<BlogComment> BlogComments { get; set; }
         public DbSet<BlogNotification> BlogNotifications { get; set; }
 

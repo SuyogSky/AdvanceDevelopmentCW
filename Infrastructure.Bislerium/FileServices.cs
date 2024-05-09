@@ -15,7 +15,6 @@ namespace Infrastructure.Bislerium
         private readonly IWebHostEnvironment _environment;
         private readonly IUrlHelper _urlHelper;
 
-
         public FileServices(IWebHostEnvironment environment, IUrlHelper urlHelper)
         {
             _environment = environment;
