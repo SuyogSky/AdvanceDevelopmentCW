@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Bislerium.Migrations
 {
     [DbContext(typeof(AplicationDBContext))]
-    [Migration("20240509020443_migration1")]
-    partial class migration1
+    [Migration("20240509184837_migrate99")]
+    partial class migrate99
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -128,6 +128,35 @@ namespace Infrastructure.Bislerium.Migrations
                     b.HasIndex("BlogPostId");
 
                     b.ToTable("BlogComments");
+                });
+
+            modelBuilder.Entity("Domain.Bislerium.BlogHistory", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("AuthorId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTime>("UpdateDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("BlogHistory");
                 });
 
             modelBuilder.Entity("Domain.Bislerium.BlogNotification", b =>
