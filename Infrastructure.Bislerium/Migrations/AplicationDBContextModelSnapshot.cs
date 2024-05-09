@@ -254,6 +254,56 @@ namespace Infrastructure.Bislerium.Migrations
                     b.ToTable("BlogReactions");
                 });
 
+            modelBuilder.Entity("Domain.Bislerium.CommentHistory", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("AuthorId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("AuthorId1")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<Guid>("BlogPostId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CommentUpdateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AuthorId1");
+
+                    b.HasIndex("BlogPostId");
+
+                    b.ToTable("CommentHistory");
+                });
+
+            modelBuilder.Entity("Domain.Bislerium.MobileTokens", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("MobileTokens");
+                });
+
             modelBuilder.Entity("Domain.Bislerium.PasswordResetOtp", b =>
                 {
                     b.Property<int>("Id")
@@ -492,6 +542,23 @@ namespace Infrastructure.Bislerium.Migrations
                     b.Navigation("Comment");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Domain.Bislerium.CommentHistory", b =>
+                {
+                    b.HasOne("Domain.Bislerium.AppUser", "Author")
+                        .WithMany()
+                        .HasForeignKey("AuthorId1");
+
+                    b.HasOne("Domain.Bislerium.BlogPost", "BlogPost")
+                        .WithMany()
+                        .HasForeignKey("BlogPostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Author");
+
+                    b.Navigation("BlogPost");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

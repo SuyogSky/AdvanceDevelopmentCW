@@ -18,5 +18,7 @@ namespace Application.Bislerium
         Task<IEnumerable<BlogWithReactions>> GetUsersBlogs(String userId);
 
         Task<IEnumerable<BlogHistory>> GetUsersBlogHistoru(String userId);
+        Task<bool> DeleteAllPostsOfUser(String userId);
+
     }
 }

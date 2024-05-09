@@ -21,13 +21,15 @@ namespace Presentation.Bislerium.Controllers
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IWebHostEnvironment _environment;
         private readonly IEmailCustomSender _emailSender;
-        public AccountController(UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager, IWebHostEnvironment environment, IOtpService service, IEmailCustomSender emailSenderService)
+        private readonly IBlogPostService _blogPostService;
+        public AccountController(UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager, IWebHostEnvironment environment, IOtpService service, IEmailCustomSender emailSenderService, IBlogPostService blogPostService)
         {
             _userManager = userManager;
             _otpService = service;
             _roleManager = roleManager;
             _environment = environment;
             _emailSender = emailSenderService;
+            _blogPostService = blogPostService;
         }
 
         [HttpPost("forgot-password")]
@@ -141,21 +143,29 @@ namespace Presentation.Bislerium.Controllers
             return Ok(users);
         }
 
-        [HttpDelete]
-        public async Task<IActionResult> DeleteUser(string userId)
+        [Authorize]
+        [HttpDelete("delete-user")]
+        public async Task<IActionResult> DeleteUser()
         {
-            var user = await _userManager.FindByIdAsync(userId);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var user = await _userManager.FindByIdAsync(userId!);
             if (user == null)
             {
-                return NotFound();
+                return NotFound("User not found.");
+            }
+            var deletionSuccess = await _blogPostService.DeleteAllPostsOfUser(userId!);
+            if (!deletionSuccess)
+            {
+                return BadRequest("Failed to delete user's blog posts and related data.");
+            }
+            var result = await _userManager.DeleteAsync(user);
+            if (!result.Succeeded)
+            {
+                var errors = result.Errors.Select(e => e.Description);
+                return BadRequest(new { message = "Failed to delete the user profile.", errors = errors });
             }
 
-            var result = await _userManager.DeleteAsync(user);
-            if (result.Succeeded)
-            {
-                return Ok("User deleted successfully.");
-            }
-            return BadRequest(result.Errors);
+            return Ok("User deleted successfully.");
         }
 
         [HttpPut, Route("UpdateStudent")]
